@@ -38,6 +38,28 @@ Artifact gerado:
 rebelion-prototype-debug-apk
 ```
 
+
+## Baixar APK pelo Termux diretamente para Downloads
+
+Depois que o GitHub Actions gerar um build com sucesso, no Termux rode:
+
+```bash
+git pull origin arena/019fb964-rebelion
+bash scripts/termux/download-latest-apk.sh --open
+```
+
+O script baixa o último APK bem-sucedido e salva em:
+
+```txt
+Downloads/Rebelion/Rebelion-prototype-latest.apk
+```
+
+Se o Termux ainda não tiver acesso ao armazenamento do Android, rode antes:
+
+```bash
+termux-setup-storage
+```
+
 ## Visão
 
 O Rebelion quer ser um universo social mobile onde o usuário possa criar sua identidade, encontrar sua turma, conversar do seu jeito e controlar seus espaços de comunidade.

@@ -46,6 +46,30 @@ O APK será publicado como artifact com o nome:
 rebelion-prototype-debug-apk
 ```
 
+
+## Baixar direto para a pasta Downloads no Termux
+
+O projeto possui um script para buscar o último APK gerado com sucesso e salvar direto na pasta de downloads do Android:
+
+```bash
+bash scripts/termux/download-latest-apk.sh --open
+```
+
+Ele salva dois arquivos:
+
+```txt
+Downloads/Rebelion/Rebelion-prototype-latest.apk
+Downloads/Rebelion/Rebelion-prototype-YYYYMMDD-HHMMSS.apk
+```
+
+O arquivo `latest` é sempre sobrescrito com o APK mais recente. O arquivo com data/hora mantém um histórico local dos APKs baixados.
+
+Caso o Termux não tenha permissão de armazenamento, execute:
+
+```bash
+termux-setup-storage
+```
+
 ## O que testar no celular
 
 - O app passa a sensação de comunidade?
