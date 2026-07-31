@@ -39,6 +39,19 @@ rebelion-prototype-debug-apk
 ```
 
 
+
+## Direção visual atual
+
+O protótipo usa o tema padrão **Rebelion Mono**: preto, branco, grafite e cinza.
+
+A decisão é manter a interface inicial mais neutra e madura, deixando cores fortes para o futuro sistema de personalização de perfil e tema do usuário.
+
+Documento:
+
+```txt
+docs/ux/personalization-system.md
+```
+
 ## Baixar APK pelo Termux diretamente para Downloads
 
 Depois que o GitHub Actions gerar um build com sucesso, no Termux rode:

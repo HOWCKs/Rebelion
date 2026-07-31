@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -481,7 +482,7 @@ private fun RebelionGradientBackground(content: @Composable () -> Unit) {
                     colors = listOf(
                         RebelionColors.DeepSpace,
                         RebelionColors.Panel,
-                        Color(0xFF120A28)
+                        Color(0xFF101116)
                     )
                 )
             )
@@ -501,7 +502,7 @@ private fun TopGreeting(nickname: String) {
             Text("Olá, $nickname", color = Color.White, fontWeight = FontWeight.Black, fontSize = 28.sp)
             Text("Seu universo está acordando.", color = RebelionColors.Mist, fontSize = 14.sp)
         }
-        AvatarBubble(label = nickname.take(1).uppercase().ifBlank { "R" }, color = RebelionColors.Purple)
+        AvatarBubble(label = nickname.take(1).uppercase().ifBlank { "R" }, color = RebelionColors.Steel)
     }
 }
 
@@ -511,7 +512,7 @@ private fun ProfilePreviewCard(nickname: String) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = RebelionColors.Panel),
-        border = BorderStroke(1.dp, RebelionColors.Purple.copy(alpha = 0.35f))
+        border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.18f))
     ) {
         Column {
             Box(
@@ -520,7 +521,7 @@ private fun ProfilePreviewCard(nickname: String) {
                     .height(98.dp)
                     .background(
                         Brush.horizontalGradient(
-                            listOf(RebelionColors.Purple, RebelionColors.Cyan, Color(0xFFFF3D8B))
+                            listOf(RebelionColors.Ink, RebelionColors.Graphite, RebelionColors.Silver)
                         )
                     )
             )
@@ -528,7 +529,7 @@ private fun ProfilePreviewCard(nickname: String) {
                 modifier = Modifier.padding(18.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AvatarBubble(label = nickname.take(1).uppercase(), color = RebelionColors.Cyan, size = 64)
+                AvatarBubble(label = nickname.take(1).uppercase(), color = RebelionColors.Steel, size = 64)
                 Spacer(Modifier.width(14.dp))
                 Column {
                     Text(nickname, color = Color.White, fontWeight = FontWeight.Black, fontSize = 24.sp)
@@ -567,7 +568,7 @@ private fun ConversationCard(conversation: Conversation) {
                         .background(RebelionColors.Purple),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(conversation.unread.toString(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    Text(conversation.unread.toString(), color = RebelionColors.DeepSpace, fontWeight = FontWeight.Bold, fontSize = 12.sp)
                 }
             }
         }
@@ -605,8 +606,8 @@ private fun PinnedCoreCard(title: String, body: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF201339)),
-        border = BorderStroke(1.dp, RebelionColors.Cyan.copy(alpha = 0.35f))
+        colors = CardDefaults.cardColors(containerColor = RebelionColors.Elevated),
+        border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.18f))
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text("✦ $title", color = RebelionColors.Cyan, fontWeight = FontWeight.Bold)
@@ -665,9 +666,9 @@ private fun RebelionButton(text: String, onClick: () -> Unit) {
             .fillMaxWidth()
             .height(54.dp),
         shape = RoundedCornerShape(18.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = RebelionColors.Purple)
+        colors = ButtonDefaults.buttonColors(containerColor = RebelionColors.White)
     ) {
-        Text(text, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Text(text, color = RebelionColors.DeepSpace, fontWeight = FontWeight.Bold, fontSize = 16.sp)
     }
 }
 
@@ -712,7 +713,7 @@ private fun FlowLikeChips(values: List<String>, selectedValues: List<String>, on
                         label = { Text(value) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = RebelionColors.Purple,
-                            selectedLabelColor = Color.White,
+                            selectedLabelColor = RebelionColors.DeepSpace,
                             containerColor = RebelionColors.Panel,
                             labelColor = RebelionColors.Mist
                         ),
@@ -731,12 +732,13 @@ private fun AvatarBubble(label: String, color: Color, size: Int = 48) {
             .clip(CircleShape)
             .background(
                 Brush.linearGradient(
-                    listOf(color, RebelionColors.Purple)
+                    listOf(color, RebelionColors.Graphite)
                 )
             ),
         contentAlignment = Alignment.Center
     ) {
-        Text(label.uppercase(), color = Color.White, fontWeight = FontWeight.Black, fontSize = (size / 2.4).sp)
+        val textColor = if (color.luminance() > 0.55f) RebelionColors.DeepSpace else RebelionColors.White
+        Text(label.uppercase(), color = textColor, fontWeight = FontWeight.Black, fontSize = (size / 2.4).sp)
     }
 }
 
@@ -746,10 +748,10 @@ private fun RebelionMark(size: Int) {
         modifier = Modifier
             .size(size.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(Brush.linearGradient(listOf(RebelionColors.Purple, RebelionColors.Cyan))),
+            .background(Brush.linearGradient(listOf(RebelionColors.Graphite, RebelionColors.White))),
         contentAlignment = Alignment.Center
     ) {
-        Text("R", color = Color.White, fontWeight = FontWeight.Black, fontSize = (size / 1.7).sp)
+        Text("R", color = RebelionColors.DeepSpace, fontWeight = FontWeight.Black, fontSize = (size / 1.7).sp)
     }
 }
 
@@ -779,10 +781,10 @@ private fun SectionHeader(text: String) {
 }
 
 private fun sampleConversations() = listOf(
-    Conversation("Luna", "online", "Mandei um áudio com efeito robô kkk", 2, Color(0xFFFF3D8B)),
-    Conversation("Kai", "jogando", "Bora criar o grupo dos criadores hoje?", 0, RebelionColors.Cyan),
-    Conversation("Mika", "criando", "Fixei a ideia no núcleo do grupo.", 1, Color(0xFF34D399)),
-    Conversation("Ravi", "ocupado", "Depois entra na sala de voz.", 0, Color(0xFFF59E0B))
+    Conversation("Luna", "online", "Mandei um áudio com efeito robô kkk", 2, RebelionColors.Slate),
+    Conversation("Kai", "jogando", "Bora criar o grupo dos criadores hoje?", 0, RebelionColors.Steel),
+    Conversation("Mika", "criando", "Fixei a ideia no núcleo do grupo.", 1, RebelionColors.GraphiteLight),
+    Conversation("Ravi", "ocupado", "Depois entra na sala de voz.", 0, RebelionColors.WarmGrey)
 )
 
 private fun sampleGroups() = listOf(
@@ -791,41 +793,54 @@ private fun sampleGroups() = listOf(
         members = "128",
         core = "Mostre seu dom da semana: arte, música, edição, gameplay ou ideia.",
         vibe = "criativo",
-        accent = RebelionColors.Purple
+        accent = RebelionColors.Steel
     ),
     GroupSpace(
         name = "Noite de Watch Party",
         members = "54",
         core = "Escolher o próximo filme/série permitido para assistir em chamada.",
         vibe = "entretenimento",
-        accent = RebelionColors.Cyan
+        accent = RebelionColors.GraphiteLight
     ),
     GroupSpace(
         name = "Anime & Fandom BR",
         members = "302",
         core = "Tema do dia: personagens que representam sua personalidade.",
         vibe = "fandom",
-        accent = Color(0xFFFF3D8B)
+        accent = RebelionColors.Slate
     )
 )
 
 private object RebelionColors {
-    val DeepSpace = Color(0xFF080A12)
-    val Panel = Color(0xFF121522)
-    val Purple = Color(0xFF7C3AED)
-    val Cyan = Color(0xFF22D3EE)
-    val Mist = Color(0xFFD6DAF5)
-    val Muted = Color(0xFF8D94B8)
+    // Tema padrão: neutro, preto/branco/grafite.
+    // Cores fortes devem entrar depois como personalização de perfil ou tema do usuário.
+    val DeepSpace = Color(0xFF050609)
+    val Ink = Color(0xFF0A0B0F)
+    val Panel = Color(0xFF11131A)
+    val Elevated = Color(0xFF171A22)
+    val Graphite = Color(0xFF252A34)
+    val GraphiteLight = Color(0xFF3A404C)
+    val Slate = Color(0xFF565D6B)
+    val Steel = Color(0xFF7F8794)
+    val WarmGrey = Color(0xFF6F6B65)
+    val Silver = Color(0xFFD8DBE2)
+    val White = Color(0xFFF4F5F7)
+    val Mist = Color(0xFFE1E3E8)
+    val Muted = Color(0xFF9197A3)
+
+    // Aliases temporários para manter os componentes prontos para o futuro sistema de temas.
+    val Purple = White
+    val Cyan = Silver
 }
 
 @Composable
 private fun rebelionColorScheme() = androidx.compose.material3.darkColorScheme(
-    primary = RebelionColors.Purple,
-    secondary = RebelionColors.Cyan,
+    primary = RebelionColors.White,
+    secondary = RebelionColors.Silver,
     background = RebelionColors.DeepSpace,
     surface = RebelionColors.Panel,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.White,
-    onSurface = Color.White
+    onPrimary = RebelionColors.DeepSpace,
+    onSecondary = RebelionColors.DeepSpace,
+    onBackground = RebelionColors.White,
+    onSurface = RebelionColors.White
 )
