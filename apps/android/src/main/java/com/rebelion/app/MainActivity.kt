@@ -27,6 +27,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -35,7 +36,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,12 +43,22 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -62,12 +72,12 @@ class MainActivity : ComponentActivity() {
 }
 
 private enum class AppStage { Welcome, Identity, Interests, Main }
-private enum class MainTab(val label: String, val emoji: String) {
-    Home("Início", "✦"),
-    Conversations("Conversas", "💬"),
-    Groups("Grupos", "◎"),
-    Explore("Explorar", "⌁"),
-    Profile("Perfil", "◉")
+private enum class MainTab(val label: String, val icon: ImageVector) {
+    Home("Início", Icons.Filled.Home),
+    Conversations("Conversas", Icons.Filled.Chat),
+    Groups("Grupos", Icons.Filled.Group),
+    Explore("Explorar", Icons.Filled.Search),
+    Profile("Perfil", Icons.Filled.Person)
 }
 
 private data class Conversation(
@@ -166,10 +176,10 @@ private fun WelcomeScreen(onStart: () -> Unit, onEnterDemo: () -> Unit) {
                     border = BorderStroke(1.dp, RebelionColors.Cyan.copy(alpha = 0.55f)),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = RebelionColors.Cyan)
                 ) {
-                    Text("Entrar no protótipo")
+                    Text("Entrar")
                 }
                 Text(
-                    text = "Protótipo visual V1: navegação, perfil, conversas, grupos e experiência base.",
+                    text = "Entre, personalize sua presença e comece a construir seus espaços.",
                     color = RebelionColors.Muted,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 14.dp)
@@ -305,7 +315,7 @@ private fun MainExperience(nickname: String, interests: List<String>) {
                     NavigationBarItem(
                         selected = selectedTab == tab,
                         onClick = { selectedTab = tab },
-                        icon = { Text(tab.emoji, fontSize = 18.sp) },
+                        icon = { Icon(tab.icon, contentDescription = tab.label) },
                         label = { Text(tab.label, fontSize = 11.sp) }
                     )
                 }
@@ -337,24 +347,25 @@ private fun HomeScreen(nickname: String) {
         }
         item {
             PinnedCoreCard(
-                title = "Núcleo em destaque",
-                body = "Hoje: apresente seu talento, mande um áudio modificado ou chame sua turma para criar um grupo."
+                title = "Seu espaço começa aqui",
+                body = "Crie um grupo, inicie uma conversa ou personalize seu perfil para que outras pessoas reconheçam sua presença."
             )
-        }
-        item {
-            SectionHeader("Movimento agora")
-        }
-        items(sampleGroups()) { group ->
-            GroupCard(group = group)
         }
         item {
             SectionHeader("Ações rápidas")
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                QuickAction("＋", "Criar grupo", Modifier.weight(1f))
-                QuickAction("🎙", "Gravar voz", Modifier.weight(1f))
+                QuickAction(Icons.Filled.Add, "Criar grupo", Modifier.weight(1f))
+                QuickAction(Icons.Filled.Mic, "Gravar voz", Modifier.weight(1f))
             }
+        }
+        item {
+            EmptyStateCard(
+                icon = Icons.Filled.Home,
+                title = "Nada acontecendo ainda",
+                body = "Quando você criar grupos, receber mensagens ou entrar em salas, tudo aparece aqui."
+            )
         }
     }
 }
@@ -364,12 +375,19 @@ private fun ConversationsScreen() {
     RebelionScreen {
         item {
             SectionTitle(
-                title = "Conversas diretas",
-                subtitle = "Espaço mais limpo para falar 1v1 por texto, áudio normal ou áudio modificado."
+                title = "Conversas",
+                subtitle = "Fale 1v1 por texto, áudio normal ou áudio com efeitos."
             )
         }
-        items(sampleConversations()) { conversation ->
-            ConversationCard(conversation = conversation)
+        item {
+            RebelionButton(text = "Nova conversa", onClick = {})
+        }
+        item {
+            EmptyStateCard(
+                icon = Icons.Filled.Chat,
+                title = "Nenhuma conversa ainda",
+                body = "Suas mensagens diretas aparecem aqui quando você começar a conversar com alguém."
+            )
         }
     }
 }
@@ -380,14 +398,18 @@ private fun GroupsScreen() {
         item {
             SectionTitle(
                 title = "Grupos",
-                subtitle = "Crie espaços privados com dono, admins, solicitações e núcleo fixado para todos verem."
+                subtitle = "Crie espaços privados com pessoas, regras, solicitações e um núcleo fixado."
             )
         }
         item {
-            RebelionButton(text = "Criar novo grupo", onClick = {})
+            RebelionButton(text = "Criar grupo", onClick = {})
         }
-        items(sampleGroups()) { group ->
-            GroupCard(group = group)
+        item {
+            EmptyStateCard(
+                icon = Icons.Filled.Group,
+                title = "Você ainda não tem grupos",
+                body = "Os grupos que você criar ou participar vão aparecer aqui."
+            )
         }
     }
 }
@@ -398,26 +420,21 @@ private fun ExploreScreen(interests: List<String>) {
         item {
             SectionTitle(
                 title = "Explorar",
-                subtitle = "Descoberta futura de comunidades, criadores e servidores por país, idioma e interesse."
+                subtitle = "Encontre comunidades, salas e pessoas com interesses parecidos com os seus."
             )
         }
-        item {
-            PinnedCoreCard(
-                title = "Comunidades por identidade",
-                body = "O Rebelion vai recomendar grupos onde o usuário possa se reconhecer: jogos, fandoms, estudo, arte, música e entretenimento."
-            )
-        }
-        item { SectionHeader("Seus interesses") }
-        item {
-            if (interests.isEmpty()) {
-                Text("Nenhum interesse escolhido ainda.", color = RebelionColors.Muted)
-            } else {
+        if (interests.isNotEmpty()) {
+            item { SectionHeader("Seus interesses") }
+            item {
                 FlowLikeChips(values = interests, selectedValues = interests, onToggle = {})
             }
         }
-        item { SectionHeader("Categorias futuras") }
-        items(listOf("Games BR", "Anime global", "Criadores iniciantes", "Filmes e séries", "Estudo em grupo")) { item ->
-            DiscoveryCard(title = item, subtitle = "Comunidade em preparação para uma próxima fase do protótipo.")
+        item {
+            EmptyStateCard(
+                icon = Icons.Filled.Search,
+                title = "Nada para explorar ainda",
+                body = "Comunidades públicas aparecem aqui quando estiverem disponíveis para descoberta."
+            )
         }
     }
 }
@@ -432,7 +449,7 @@ private fun ProfileScreen(nickname: String, interests: List<String>) {
                     Text("Status", color = RebelionColors.Muted, fontSize = 13.sp)
                     Text("Querendo conversar ✦", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Text(
-                        "Bio: criando meu universo, encontrando minha turma e testando a primeira versão do Rebelion.",
+                        "Bio: criando meu universo, encontrando minha turma e deixando minha marca no Rebelion.",
                         color = RebelionColors.Mist,
                         lineHeight = 20.sp
                     )
@@ -441,20 +458,30 @@ private fun ProfileScreen(nickname: String, interests: List<String>) {
         }
         item { SectionHeader("Interesses") }
         item {
-            FlowLikeChips(
-                values = if (interests.isEmpty()) listOf("Jogos", "Música", "Fandoms") else interests,
-                selectedValues = if (interests.isEmpty()) listOf("Jogos", "Música", "Fandoms") else interests,
-                onToggle = {}
-            )
+            if (interests.isEmpty()) {
+                EmptyStateCard(
+                    icon = Icons.Filled.Edit,
+                    title = "Seu perfil ainda está limpo",
+                    body = "Adicione interesses, escolha sua identidade visual e deixe seu perfil com a sua cara."
+                )
+            } else {
+                FlowLikeChips(
+                    values = interests,
+                    selectedValues = interests,
+                    onToggle = {}
+                )
+            }
         }
         item {
             OutlinedButton(
                 onClick = {},
                 modifier = Modifier.fillMaxWidth(),
-                border = BorderStroke(1.dp, RebelionColors.Purple.copy(alpha = 0.8f)),
+                border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.8f)),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
             ) {
-                Text("Editar perfil em breve")
+                Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Editar perfil")
             }
         }
     }
@@ -500,7 +527,7 @@ private fun TopGreeting(nickname: String) {
     ) {
         Column {
             Text("Olá, $nickname", color = Color.White, fontWeight = FontWeight.Black, fontSize = 28.sp)
-            Text("Seu universo está acordando.", color = RebelionColors.Mist, fontSize = 14.sp)
+            Text("Construa sua presença no Rebelion.", color = RebelionColors.Mist, fontSize = 14.sp)
         }
         AvatarBubble(label = nickname.take(1).uppercase().ifBlank { "R" }, color = RebelionColors.Steel)
     }
@@ -617,6 +644,29 @@ private fun PinnedCoreCard(title: String, body: String) {
 }
 
 @Composable
+private fun EmptyStateCard(icon: ImageVector, title: String, body: String) {
+    RebelionCard {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(54.dp)
+                    .clip(CircleShape)
+                    .background(RebelionColors.Elevated),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = null, tint = RebelionColors.Silver, modifier = Modifier.size(28.dp))
+            }
+            Text(title, color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+            Text(body, color = RebelionColors.Mist, lineHeight = 20.sp)
+        }
+    }
+}
+
+@Composable
 private fun DiscoveryCard(title: String, subtitle: String) {
     RebelionCard {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -627,11 +677,12 @@ private fun DiscoveryCard(title: String, subtitle: String) {
 }
 
 @Composable
-private fun QuickAction(symbol: String, label: String, modifier: Modifier = Modifier) {
+private fun QuickAction(icon: ImageVector, label: String, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.height(92.dp),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = RebelionColors.Panel)
+        colors = CardDefaults.cardColors(containerColor = RebelionColors.Panel),
+        border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.08f))
     ) {
         Column(
             modifier = Modifier
@@ -640,7 +691,8 @@ private fun QuickAction(symbol: String, label: String, modifier: Modifier = Modi
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(symbol, color = RebelionColors.Cyan, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            Icon(icon, contentDescription = label, tint = RebelionColors.Silver, modifier = Modifier.size(28.dp))
+            Spacer(Modifier.height(8.dp))
             Text(label, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
         }
     }
