@@ -22,16 +22,22 @@ A navegação inferior deixa de ser uma `NavigationBar` padrão e passa a ser um
 
 ## Versão atual
 
-A barra usa uma simulação de liquid glass/glassmorphism com:
+A barra agora é desenhada como **overlay sobre o conteúdo**, em vez de ocupar uma área própria de rodapé. Isso permite que o conteúdo da tela apareça por trás da navegação e reduz a sensação de fundo preto sólido.
 
-- transparência maior;
+A simulação de liquid glass/glassmorphism usa:
+
+- camada base mais transparente;
 - gradiente vertical de brilho;
 - borda com gradiente;
 - sombra externa;
-- bolha selecionada com radial gradient;
+- bolha selecionada com radial gradient mais translúcido;
 - ícone ativo preenchido em cor clara;
 - ícones inativos com menor opacidade;
 - animação de slide entre abas.
+
+## Limite técnico atual
+
+Esta versão ainda não usa blur real do conteúdo atrás da barra. No Android/Compose, blur real com bom desempenho precisa ser implementado com cuidado em etapa própria. Por enquanto, a barra usa transparência, gradiente, borda e sombra para simular vidro.
 
 ## Importante
 
@@ -43,9 +49,9 @@ Mesmo sem texto visível na barra, os ícones mantêm `contentDescription`, perm
 
 ## Próximas evoluções
 
+- blur real quando disponível/viável;
 - feedback tátil;
 - ripple customizado;
-- blur real quando disponível/viável;
 - botão central de ação;
 - movimento líquido mais orgânico;
 - ícones personalizados próprios do Rebelion.

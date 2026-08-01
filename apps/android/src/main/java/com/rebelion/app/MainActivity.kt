@@ -354,47 +354,46 @@ private fun MainExperience(
         return
     }
 
-    Scaffold(
-        containerColor = RebelionColors.DeepSpace,
-        bottomBar = {
-            RebelionGlassNavBar(
-                selectedTab = selectedTab,
-                onSelectTab = { selectedTab = it }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(RebelionColors.DeepSpace)
+    ) {
+        when (selectedTab) {
+            MainTab.Home -> HomeScreen(nickname = nickname, onEditCard = { editingCard = true })
+            MainTab.Conversations -> ConversationsScreen()
+            MainTab.Groups -> GroupsScreen()
+            MainTab.Explore -> ExploreScreen(interests = interests)
+            MainTab.Profile -> ProfileScreen(
+                nickname = nickname,
+                bio = bio,
+                status = status,
+                cardStyle = cardStyle,
+                interests = interests,
+                onEditCard = { editingCard = true }
             )
         }
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(RebelionColors.DeepSpace)
-        ) {
-            when (selectedTab) {
-                MainTab.Home -> HomeScreen(nickname = nickname, onEditCard = { editingCard = true })
-                MainTab.Conversations -> ConversationsScreen()
-                MainTab.Groups -> GroupsScreen()
-                MainTab.Explore -> ExploreScreen(interests = interests)
-                MainTab.Profile -> ProfileScreen(
-                    nickname = nickname,
-                    bio = bio,
-                    status = status,
-                    cardStyle = cardStyle,
-                    interests = interests,
-                    onEditCard = { editingCard = true }
-                )
-            }
-        }
+
+        RebelionGlassNavBar(
+            selectedTab = selectedTab,
+            onSelectTab = { selectedTab = it },
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }
 
 @Composable
-private fun RebelionGlassNavBar(selectedTab: MainTab, onSelectTab: (MainTab) -> Unit) {
+private fun RebelionGlassNavBar(
+    selectedTab: MainTab,
+    onSelectTab: (MainTab) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val tabs = MainTab.entries
     val selectedIndex = tabs.indexOf(selectedTab).coerceAtLeast(0)
     val indicatorSize = 64.dp
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 18.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
@@ -410,13 +409,13 @@ private fun RebelionGlassNavBar(selectedTab: MainTab, onSelectTab: (MainTab) -> 
                     spotColor = Color.Black.copy(alpha = 0.65f)
                 )
                 .clip(RoundedCornerShape(42.dp))
-                .background(RebelionColors.Glass.copy(alpha = 0.38f))
+                .background(RebelionColors.Glass.copy(alpha = 0.12f))
                 .background(
                     Brush.verticalGradient(
                         listOf(
-                            Color.White.copy(alpha = 0.22f),
-                            Color.White.copy(alpha = 0.06f),
-                            Color.Black.copy(alpha = 0.18f)
+                            Color.White.copy(alpha = 0.30f),
+                            Color.White.copy(alpha = 0.08f),
+                            RebelionColors.GlassGlow.copy(alpha = 0.05f)
                         )
                     )
                 )
@@ -424,9 +423,9 @@ private fun RebelionGlassNavBar(selectedTab: MainTab, onSelectTab: (MainTab) -> 
                     width = 1.dp,
                     brush = Brush.horizontalGradient(
                         listOf(
-                            Color.White.copy(alpha = 0.42f),
-                            Color.White.copy(alpha = 0.12f),
-                            RebelionColors.GlassGlow.copy(alpha = 0.28f)
+                            Color.White.copy(alpha = 0.54f),
+                            Color.White.copy(alpha = 0.18f),
+                            RebelionColors.GlassGlow.copy(alpha = 0.34f)
                         )
                     ),
                     shape = RoundedCornerShape(42.dp)
@@ -460,9 +459,9 @@ private fun RebelionGlassNavBar(selectedTab: MainTab, onSelectTab: (MainTab) -> 
                         .background(
                             Brush.radialGradient(
                                 listOf(
-                                    Color.White.copy(alpha = 0.26f),
-                                    RebelionColors.GlassSelected.copy(alpha = 0.82f),
-                                    RebelionColors.GlassSelected.copy(alpha = 0.48f)
+                                    Color.White.copy(alpha = 0.34f),
+                                    RebelionColors.GlassSelected.copy(alpha = 0.54f),
+                                    RebelionColors.GlassSelected.copy(alpha = 0.22f)
                                 )
                             )
                         )
@@ -777,7 +776,7 @@ private fun RebelionScreen(content: androidx.compose.foundation.lazy.LazyListSco
             .fillMaxSize()
             .padding(horizontal = 18.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 22.dp, bottom = 22.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 22.dp, bottom = 122.dp),
         content = content
     )
 }
