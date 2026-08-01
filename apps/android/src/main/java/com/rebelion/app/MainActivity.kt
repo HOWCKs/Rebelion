@@ -346,10 +346,10 @@ private fun HomeScreen(nickname: String) {
             HubHeader(nickname = nickname)
         }
         item {
-            PresenceCard()
+            CoreNucleusCard()
         }
         item {
-            SectionHeader("Criar")
+            SectionHeader("Mover agora")
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -364,13 +364,10 @@ private fun HomeScreen(nickname: String) {
             }
         }
         item {
-            SectionHeader("Pulso")
-        }
-        item {
             EmptyStateCard(
                 icon = Icons.Filled.Home,
                 title = "O pulso está quieto",
-                body = "Quando algo acontecer nas suas DMs, espaços ou convites, aparece aqui."
+                body = "Quando algo acontecer nas suas DMs, espaços ou convites, o Núcleo muda primeiro."
             )
         }
     }
@@ -448,33 +445,37 @@ private fun ExploreScreen(interests: List<String>) {
 @Composable
 private fun ProfileScreen(nickname: String, interests: List<String>) {
     RebelionScreen {
+        item {
+            SectionTitle(
+                title = "Eu",
+                subtitle = "Seu Cartão Rebelion reúne presença, identidade, estilo e controle."
+            )
+        }
         item { ProfilePreviewCard(nickname = nickname.ifBlank { "Nox" }) }
         item {
-            RebelionCard {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Status", color = RebelionColors.Muted, fontSize = 13.sp)
-                    Text("Querendo conversar ✦", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                    Text(
-                        "Bio: criando meu universo, encontrando minha turma e deixando minha marca no Rebelion.",
-                        color = RebelionColors.Mist,
-                        lineHeight = 20.sp
-                    )
-                }
-            }
+            RebelionIdentityCard(interests = interests)
         }
-        item { SectionHeader("Identidade") }
         item {
-            if (interests.isEmpty()) {
-                EmptyStateCard(
-                    icon = Icons.Filled.Edit,
-                    title = "Sua identidade está em branco",
-                    body = "Adicione interesses, status e estilo para ser reconhecido do seu jeito."
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                RebelionSectionTile(
+                    icon = Icons.Filled.Person,
+                    title = "Presença",
+                    body = "Status, bio e como você quer ser encontrado."
                 )
-            } else {
-                FlowLikeChips(
-                    values = interests,
-                    selectedValues = interests,
-                    onToggle = {}
+                RebelionSectionTile(
+                    icon = Icons.Filled.Edit,
+                    title = "Identidade",
+                    body = "Nickname, interesses e marcas que definem seu perfil."
+                )
+                RebelionSectionTile(
+                    icon = Icons.Filled.Home,
+                    title = "Estilo",
+                    body = "Banner, avatar, cores e aparência pública."
+                )
+                RebelionSectionTile(
+                    icon = Icons.Filled.Search,
+                    title = "Controle",
+                    body = "Privacidade, DMs e visibilidade dentro dos espaços."
                 )
             }
         }
@@ -487,7 +488,7 @@ private fun ProfileScreen(nickname: String, interests: List<String>) {
             ) {
                 Icon(Icons.Filled.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Editar perfil")
+                Text("Editar Cartão")
             }
         }
     }
@@ -540,35 +541,155 @@ private fun HubHeader(nickname: String) {
 }
 
 @Composable
-private fun PresenceCard() {
+private fun CoreNucleusCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(30.dp),
         colors = CardDefaults.cardColors(containerColor = RebelionColors.Elevated),
-        border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.14f))
+        border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.18f))
     ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(
+            modifier = Modifier.padding(18.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Text("Núcleo", color = RebelionColors.Muted, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+            Box(
+                modifier = Modifier
+                    .size(148.dp)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                RebelionColors.GraphiteLight,
+                                RebelionColors.Graphite,
+                                RebelionColors.Panel
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(112.dp)
+                        .clip(CircleShape)
+                        .background(RebelionColors.DeepSpace),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("QUIETO", color = RebelionColors.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                        Text("agora", color = RebelionColors.Muted, fontSize = 12.sp)
+                    }
+                }
+            }
+            Text(
+                "Seu Núcleo mostra presença, movimento e sinais importantes dos seus espaços.",
+                color = RebelionColors.Mist,
+                lineHeight = 20.sp
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                NucleusMetric("DMs", "0", Modifier.weight(1f))
+                NucleusMetric("Espaços", "0", Modifier.weight(1f))
+                NucleusMetric("Convites", "0", Modifier.weight(1f))
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(18.dp))
+                    .background(RebelionColors.Panel)
+                    .padding(12.dp)
+            ) {
+                Text("Presença: querendo conversar ✦", color = RebelionColors.White, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+private fun NucleusMetric(label: String, value: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(18.dp))
+            .background(RebelionColors.Panel)
+            .padding(horizontal = 10.dp, vertical = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(value, color = RebelionColors.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+            Text(label, color = RebelionColors.Muted, fontSize = 11.sp)
+        }
+    }
+}
+
+@Composable
+private fun RebelionIdentityCard(interests: List<String>) {
+    RebelionCard {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(42.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
-                        .background(RebelionColors.Panel),
+                        .background(RebelionColors.Elevated),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(Icons.Filled.Person, contentDescription = null, tint = RebelionColors.Silver)
                 }
                 Spacer(Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Presença", color = RebelionColors.Muted, fontSize = 13.sp)
-                    Text("Querendo conversar ✦", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                Column {
+                    Text("Cartão Rebelion", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                    Text("Sua identidade pública começa aqui.", color = RebelionColors.Muted, fontSize = 13.sp)
                 }
             }
+            Text("Querendo conversar ✦", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(
-                "Seu status mostra como você quer ser encontrado no Rebelion.",
+                "Bio: criando meu universo, encontrando minha turma e deixando minha marca no Rebelion.",
                 color = RebelionColors.Mist,
                 lineHeight = 20.sp
             )
+            if (interests.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(RebelionColors.DeepSpace)
+                        .padding(12.dp)
+                ) {
+                    Text("Identidade em branco: adicione interesses, status e estilo para ser reconhecido do seu jeito.", color = RebelionColors.Mist, lineHeight = 20.sp)
+                }
+            } else {
+                FlowLikeChips(values = interests, selectedValues = interests, onToggle = {})
+            }
+        }
+    }
+}
+
+@Composable
+private fun RebelionSectionTile(icon: ImageVector, title: String, body: String) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = RebelionColors.Panel),
+        border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.08f))
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(CircleShape)
+                    .background(RebelionColors.Elevated),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = null, tint = RebelionColors.Silver, modifier = Modifier.size(22.dp))
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, color = Color.White, fontWeight = FontWeight.Black, fontSize = 16.sp)
+                Text(body, color = RebelionColors.Mist, lineHeight = 18.sp, fontSize = 13.sp)
+            }
         }
     }
 }
