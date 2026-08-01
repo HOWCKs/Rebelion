@@ -107,6 +107,7 @@ private fun RebelionApp() {
         var nickname by remember { mutableStateOf("Nox") }
         var bio by remember { mutableStateOf("criando meu universo, encontrando minha turma e deixando minha marca no Rebelion.") }
         var status by remember { mutableStateOf("Querendo conversar ✦") }
+        var cardStyle by remember { mutableStateOf("Mono") }
         val selectedInterests = remember { mutableStateListOf<String>() }
 
         Surface(
@@ -138,11 +139,13 @@ private fun RebelionApp() {
                     nickname = nickname,
                     bio = bio,
                     status = status,
+                    cardStyle = cardStyle,
                     interests = selectedInterests,
-                    onSaveCard = { newNickname, newBio, newStatus, newInterests ->
+                    onSaveCard = { newNickname, newBio, newStatus, newStyle, newInterests ->
                         nickname = newNickname.ifBlank { "Nox" }
                         bio = newBio
                         status = newStatus
+                        cardStyle = newStyle
                         selectedInterests.clear()
                         selectedInterests.addAll(newInterests)
                     }
@@ -320,8 +323,9 @@ private fun MainExperience(
     nickname: String,
     bio: String,
     status: String,
+    cardStyle: String,
     interests: List<String>,
-    onSaveCard: (String, String, String, List<String>) -> Unit
+    onSaveCard: (String, String, String, String, List<String>) -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(MainTab.Home) }
     var editingCard by remember { mutableStateOf(false) }
@@ -331,10 +335,11 @@ private fun MainExperience(
             nickname = nickname,
             bio = bio,
             status = status,
+            cardStyle = cardStyle,
             interests = interests,
             onBack = { editingCard = false },
-            onSave = { newNickname, newBio, newStatus, newInterests ->
-                onSaveCard(newNickname, newBio, newStatus, newInterests)
+            onSave = { newNickname, newBio, newStatus, newStyle, newInterests ->
+                onSaveCard(newNickname, newBio, newStatus, newStyle, newInterests)
                 editingCard = false
                 selectedTab = MainTab.Profile
             }
@@ -372,6 +377,7 @@ private fun MainExperience(
                     nickname = nickname,
                     bio = bio,
                     status = status,
+                    cardStyle = cardStyle,
                     interests = interests,
                     onEditCard = { editingCard = true }
                 )
@@ -484,7 +490,7 @@ private fun ExploreScreen(interests: List<String>) {
 }
 
 @Composable
-private fun ProfileScreen(nickname: String, bio: String, status: String, interests: List<String>, onEditCard: () -> Unit) {
+private fun ProfileScreen(nickname: String, bio: String, status: String, cardStyle: String, interests: List<String>, onEditCard: () -> Unit) {
     RebelionScreen {
         item {
             SectionTitle(
@@ -492,9 +498,9 @@ private fun ProfileScreen(nickname: String, bio: String, status: String, interes
                 subtitle = "Seu Cartão Rebelion reúne presença, identidade, estilo e controle."
             )
         }
-        item { ProfilePreviewCard(nickname = nickname.ifBlank { "Nox" }, status = status) }
+        item { ProfilePreviewCard(nickname = nickname.ifBlank { "Nox" }, status = status, cardStyle = cardStyle) }
         item {
-            RebelionIdentityCard(bio = bio, status = status, interests = interests)
+            RebelionIdentityCard(bio = bio, status = status, cardStyle = cardStyle, interests = interests)
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -540,15 +546,16 @@ private fun EditCardScreen(
     nickname: String,
     bio: String,
     status: String,
+    cardStyle: String,
     interests: List<String>,
     onBack: () -> Unit,
-    onSave: (String, String, String, List<String>) -> Unit
+    onSave: (String, String, String, String, List<String>) -> Unit
 ) {
     var draftNickname by remember { mutableStateOf(nickname) }
     var draftBio by remember { mutableStateOf(bio) }
     var draftStatus by remember { mutableStateOf(status) }
     val draftInterests = remember { mutableStateListOf<String>().apply { addAll(interests) } }
-    var selectedStyle by remember { mutableStateOf("Mono") }
+    var selectedStyle by remember { mutableStateOf(cardStyle) }
 
     LazyColumn(
         modifier = Modifier
@@ -578,7 +585,7 @@ private fun EditCardScreen(
             }
         }
         item {
-            ProfilePreviewCard(nickname = draftNickname.ifBlank { "Nox" }, status = draftStatus)
+            ProfilePreviewCard(nickname = draftNickname.ifBlank { "Nox" }, status = draftStatus, cardStyle = selectedStyle)
         }
         item {
             RebelionCard {
@@ -620,7 +627,7 @@ private fun EditCardScreen(
             RebelionCard {
                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Text("Estilo do cartão", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
-                    Text("Nesta fase, o estilo muda a intenção visual do cartão. As cores completas entram na próxima etapa.", color = RebelionColors.Mist, lineHeight = 20.sp)
+                    Text("O estilo muda o banner, avatar e destaque público do seu Cartão Rebelion.", color = RebelionColors.Mist, lineHeight = 20.sp)
                     FlowLikeChips(
                         values = listOf("Mono", "Neon", "Aurora", "Minimal"),
                         selectedValues = listOf(selectedStyle),
@@ -632,7 +639,7 @@ private fun EditCardScreen(
         item {
             RebelionButton(
                 text = "Salvar Cartão",
-                onClick = { onSave(draftNickname, draftBio, draftStatus, draftInterests.toList()) }
+                onClick = { onSave(draftNickname, draftBio, draftStatus, selectedStyle, draftInterests.toList()) }
             )
         }
     }
@@ -766,7 +773,7 @@ private fun NucleusMetric(label: String, value: String, modifier: Modifier = Mod
 }
 
 @Composable
-private fun RebelionIdentityCard(bio: String, status: String, interests: List<String>) {
+private fun RebelionIdentityCard(bio: String, status: String, cardStyle: String, interests: List<String>) {
     RebelionCard {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -785,7 +792,10 @@ private fun RebelionIdentityCard(bio: String, status: String, interests: List<St
                     Text("Sua identidade pública começa aqui.", color = RebelionColors.Muted, fontSize = 13.sp)
                 }
             }
-            Text(status, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(status, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                MiniStylePill(cardStyle)
+            }
             Text(
                 "Bio: $bio",
                 color = RebelionColors.Mist,
@@ -839,12 +849,24 @@ private fun RebelionSectionTile(icon: ImageVector, title: String, body: String) 
 }
 
 @Composable
-private fun ProfilePreviewCard(nickname: String, status: String = "Querendo conversar ✦") {
+private fun MiniStylePill(style: String) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(99.dp))
+            .background(cardStyleAccent(style).copy(alpha = 0.16f))
+            .padding(horizontal = 9.dp, vertical = 5.dp)
+    ) {
+        Text(style, color = cardStyleAccent(style), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+private fun ProfilePreviewCard(nickname: String, status: String = "Querendo conversar ✦", cardStyle: String = "Mono") {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = RebelionColors.Panel),
-        border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.18f))
+        border = BorderStroke(1.dp, cardStyleAccent(cardStyle).copy(alpha = 0.38f))
     ) {
         Column {
             Box(
@@ -852,21 +874,19 @@ private fun ProfilePreviewCard(nickname: String, status: String = "Querendo conv
                     .fillMaxWidth()
                     .height(98.dp)
                     .background(
-                        Brush.horizontalGradient(
-                            listOf(RebelionColors.Ink, RebelionColors.Graphite, RebelionColors.Silver)
-                        )
+                        Brush.horizontalGradient(cardStyleGradient(cardStyle))
                     )
             )
             Row(
                 modifier = Modifier.padding(18.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AvatarBubble(label = nickname.take(1).uppercase(), color = RebelionColors.Steel, size = 64)
+                AvatarBubble(label = nickname.take(1).uppercase(), color = cardStyleAccent(cardStyle), size = 64)
                 Spacer(Modifier.width(14.dp))
                 Column {
                     Text(nickname, color = Color.White, fontWeight = FontWeight.Black, fontSize = 24.sp)
                     Text("@${nickname.lowercase().filter { it.isLetterOrDigit() }.ifBlank { "usuario" }}", color = RebelionColors.Muted)
-                    Text(status, color = RebelionColors.Cyan, fontSize = 13.sp)
+                    Text(status, color = cardStyleAccent(cardStyle), fontSize = 13.sp)
                 }
             }
         }
@@ -1135,6 +1155,20 @@ private fun SectionTitle(title: String, subtitle: String) {
 @Composable
 private fun SectionHeader(text: String) {
     Text(text, color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+}
+
+private fun cardStyleAccent(style: String): Color = when (style) {
+    "Neon" -> Color(0xFF22D3EE)
+    "Aurora" -> Color(0xFFFF5DA2)
+    "Minimal" -> Color(0xFFF4F5F7)
+    else -> RebelionColors.Steel
+}
+
+private fun cardStyleGradient(style: String): List<Color> = when (style) {
+    "Neon" -> listOf(Color(0xFF080A12), Color(0xFF12303A), Color(0xFF22D3EE))
+    "Aurora" -> listOf(Color(0xFF0B0712), Color(0xFF44205E), Color(0xFFFF5DA2))
+    "Minimal" -> listOf(Color(0xFF050609), Color(0xFF1C1D22), Color(0xFFF4F5F7))
+    else -> listOf(RebelionColors.Ink, RebelionColors.Graphite, RebelionColors.Silver)
 }
 
 private fun interestOptions() = listOf(
