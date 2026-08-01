@@ -398,37 +398,40 @@ private fun RebelionGlassNavBar(
             .padding(horizontal = 18.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
+        val navShape = RoundedCornerShape(42.dp)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(84.dp)
                 .shadow(
-                    elevation = 18.dp,
-                    shape = RoundedCornerShape(42.dp),
-                    ambientColor = RebelionColors.GlassGlow.copy(alpha = 0.22f),
-                    spotColor = Color.Black.copy(alpha = 0.65f)
+                    elevation = 20.dp,
+                    shape = navShape,
+                    ambientColor = RebelionColors.GlassGlow.copy(alpha = 0.28f),
+                    spotColor = Color.Black.copy(alpha = 0.72f)
                 )
-                .clip(RoundedCornerShape(42.dp))
-                .background(RebelionColors.Glass.copy(alpha = 0.08f))
+                .clip(navShape)
+                .background(Color.White.copy(alpha = 0.14f), navShape)
+                .background(RebelionColors.Glass.copy(alpha = 0.06f), navShape)
                 .background(
-                    Brush.verticalGradient(
+                    brush = Brush.verticalGradient(
                         listOf(
-                            Color.White.copy(alpha = 0.42f),
-                            Color.White.copy(alpha = 0.20f),
-                            RebelionColors.GlassGlow.copy(alpha = 0.10f)
+                            Color.White.copy(alpha = 0.46f),
+                            Color.White.copy(alpha = 0.24f),
+                            RebelionColors.GlassGlow.copy(alpha = 0.12f)
                         )
-                    )
+                    ),
+                    shape = navShape
                 )
                 .border(
                     width = 1.dp,
                     brush = Brush.horizontalGradient(
                         listOf(
-                            Color.White.copy(alpha = 0.54f),
-                            Color.White.copy(alpha = 0.18f),
-                            RebelionColors.GlassGlow.copy(alpha = 0.34f)
+                            Color.White.copy(alpha = 0.64f),
+                            Color.White.copy(alpha = 0.26f),
+                            RebelionColors.GlassGlow.copy(alpha = 0.40f)
                         )
                     ),
-                    shape = RoundedCornerShape(42.dp)
+                    shape = navShape
                 )
                 .padding(horizontal = 10.dp),
             contentAlignment = Alignment.Center
@@ -446,18 +449,31 @@ private fun RebelionGlassNavBar(
                     label = "glass-nav-indicator"
                 )
 
-                // Frosted veil: abafa textos/bordas que passam por baixo da barra.
+                // Frosted veil: camada leitosa que reduz a leitura de textos/bordas por trás da barra.
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .clip(navShape)
+                        .background(Color.White.copy(alpha = 0.12f), navShape)
                         .background(
-                            Brush.horizontalGradient(
+                            brush = Brush.horizontalGradient(
                                 listOf(
-                                    Color.White.copy(alpha = 0.12f),
-                                    Color.White.copy(alpha = 0.20f),
-                                    Color.White.copy(alpha = 0.10f)
+                                    Color.White.copy(alpha = 0.24f),
+                                    Color.White.copy(alpha = 0.36f),
+                                    Color.White.copy(alpha = 0.22f)
                                 )
-                            )
+                            ),
+                            shape = navShape
+                        )
+                        .background(
+                            brush = Brush.verticalGradient(
+                                listOf(
+                                    Color.White.copy(alpha = 0.22f),
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.08f)
+                                )
+                            ),
+                            shape = navShape
                         )
                 )
 
@@ -476,9 +492,9 @@ private fun RebelionGlassNavBar(
                         .background(
                             Brush.verticalGradient(
                                 listOf(
-                                    Color.White.copy(alpha = 0.34f),
-                                    RebelionColors.GlassSelected.copy(alpha = 0.62f),
-                                    RebelionColors.GlassSelected.copy(alpha = 0.30f)
+                                    Color.White.copy(alpha = 0.38f),
+                                    RebelionColors.GlassSelected.copy(alpha = 0.54f),
+                                    RebelionColors.GlassSelected.copy(alpha = 0.22f)
                                 )
                             )
                         )

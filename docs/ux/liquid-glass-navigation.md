@@ -28,8 +28,9 @@ Para evitar que textos e bordas passando por baixo pareçam estar acima da barra
 
 A simulação de liquid glass/glassmorphism usa:
 
-- camada base muito transparente;
-- frosted veil interno;
+- camada base transparente com preenchimento leitoso;
+- frosted veil interno mais forte para abafar conteúdo por trás;
+- todas as camadas internas recortadas com o mesmo shape arredondado;
 - gradiente vertical de brilho;
 - borda com gradiente;
 - sombra externa;
@@ -44,7 +45,7 @@ A seleção não usa mais uma bolinha pequena ao redor do ícone. Agora ela usa 
 
 ## Limite técnico atual
 
-Esta versão ainda não usa blur real do conteúdo atrás da barra. No Android/Compose, blur real com bom desempenho precisa ser implementado com cuidado em etapa própria. Por enquanto, a barra usa transparência, gradiente, camada leitosa, borda e sombra para simular vidro.
+Esta versão ainda não usa blur real do conteúdo atrás da barra. No Android/Compose, blur real com bom desempenho precisa ser implementado com cuidado em etapa própria. Por enquanto, a barra usa transparência, gradiente, camada leitosa reforçada, borda e sombra para simular vidro fosco.
 
 ## Importante
 
