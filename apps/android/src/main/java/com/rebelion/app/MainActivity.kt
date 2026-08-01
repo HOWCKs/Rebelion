@@ -73,11 +73,11 @@ class MainActivity : ComponentActivity() {
 
 private enum class AppStage { Welcome, Identity, Interests, Main }
 private enum class MainTab(val label: String, val icon: ImageVector) {
-    Home("Início", Icons.Filled.Home),
-    Conversations("Conversas", Icons.Filled.Chat),
-    Groups("Grupos", Icons.Filled.Group),
-    Explore("Explorar", Icons.Filled.Search),
-    Profile("Perfil", Icons.Filled.Person)
+    Home("Hub", Icons.Filled.Home),
+    Conversations("DMs", Icons.Filled.Chat),
+    Groups("Espaços", Icons.Filled.Group),
+    Explore("Radar", Icons.Filled.Search),
+    Profile("Eu", Icons.Filled.Person)
 }
 
 private data class Conversation(
@@ -158,7 +158,7 @@ private fun WelcomeScreen(onStart: () -> Unit, onEnterDemo: () -> Unit) {
                     letterSpacing = 2.sp
                 )
                 Text(
-                    text = "Seu espaço. Sua voz. Sua comunidade.",
+                    text = "Seu hub. Sua voz. Seus espaços.",
                     color = RebelionColors.Mist,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(top = 8.dp)
@@ -179,7 +179,7 @@ private fun WelcomeScreen(onStart: () -> Unit, onEnterDemo: () -> Unit) {
                     Text("Entrar")
                 }
                 Text(
-                    text = "Entre, personalize sua presença e comece a construir seus espaços.",
+                    text = "Entre, escolha sua presença e comece a construir seus espaços.",
                     color = RebelionColors.Muted,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 14.dp)
@@ -194,20 +194,20 @@ private fun HeroCard() {
     RebelionCard {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Text(
-                text = "Crie um universo social do seu jeito",
+                text = "Construa seu universo social",
                 color = Color.White,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Converse, monte grupos, personalize sua presença e transforme salas comuns em espaços vivos.",
+                text = "Crie espaços, inicie laços e personalize como você aparece para sua comunidade.",
                 color = RebelionColors.Mist,
                 fontSize = 15.sp,
                 lineHeight = 21.sp
             )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MiniPill("DM 1v1")
-                MiniPill("Grupos")
+                MiniPill("DMs")
+                MiniPill("Espaços")
                 MiniPill("Voz")
             }
         }
@@ -343,28 +343,34 @@ private fun MainExperience(nickname: String, interests: List<String>) {
 private fun HomeScreen(nickname: String) {
     RebelionScreen {
         item {
-            TopGreeting(nickname = nickname)
+            HubHeader(nickname = nickname)
         }
         item {
-            PinnedCoreCard(
-                title = "Seu espaço começa aqui",
-                body = "Crie um grupo, inicie uma conversa ou personalize seu perfil para que outras pessoas reconheçam sua presença."
-            )
+            PresenceCard()
         }
         item {
-            SectionHeader("Ações rápidas")
+            SectionHeader("Criar")
         }
         item {
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                QuickAction(Icons.Filled.Add, "Criar grupo", Modifier.weight(1f))
-                QuickAction(Icons.Filled.Mic, "Gravar voz", Modifier.weight(1f))
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                    QuickAction(Icons.Filled.Group, "Criar espaço", Modifier.weight(1f))
+                    QuickAction(Icons.Filled.Chat, "Nova DM", Modifier.weight(1f))
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                    QuickAction(Icons.Filled.Mic, "Gravar voz", Modifier.weight(1f))
+                    QuickAction(Icons.Filled.Edit, "Personalizar", Modifier.weight(1f))
+                }
             }
+        }
+        item {
+            SectionHeader("Pulso")
         }
         item {
             EmptyStateCard(
                 icon = Icons.Filled.Home,
-                title = "Nada acontecendo ainda",
-                body = "Quando você criar grupos, receber mensagens ou entrar em salas, tudo aparece aqui."
+                title = "O pulso está quieto",
+                body = "Quando algo acontecer nas suas DMs, espaços ou convites, aparece aqui."
             )
         }
     }
@@ -375,18 +381,18 @@ private fun ConversationsScreen() {
     RebelionScreen {
         item {
             SectionTitle(
-                title = "Conversas",
-                subtitle = "Fale 1v1 por texto, áudio normal ou áudio com efeitos."
+                title = "DMs",
+                subtitle = "Conexões diretas para conversar por texto, áudio normal ou voz com efeitos."
             )
         }
         item {
-            RebelionButton(text = "Nova conversa", onClick = {})
+            RebelionButton(text = "Iniciar DM", onClick = {})
         }
         item {
             EmptyStateCard(
                 icon = Icons.Filled.Chat,
-                title = "Nenhuma conversa ainda",
-                body = "Suas mensagens diretas aparecem aqui quando você começar a conversar com alguém."
+                title = "Nenhum laço iniciado",
+                body = "Comece uma DM e crie sua primeira conexão dentro do Rebelion."
             )
         }
     }
@@ -397,18 +403,18 @@ private fun GroupsScreen() {
     RebelionScreen {
         item {
             SectionTitle(
-                title = "Grupos",
-                subtitle = "Crie espaços privados com pessoas, regras, solicitações e um núcleo fixado."
+                title = "Espaços",
+                subtitle = "Crie lugares privados para sua turma conversar, organizar ideias e manter um núcleo vivo."
             )
         }
         item {
-            RebelionButton(text = "Criar grupo", onClick = {})
+            RebelionButton(text = "Criar espaço", onClick = {})
         }
         item {
             EmptyStateCard(
                 icon = Icons.Filled.Group,
-                title = "Você ainda não tem grupos",
-                body = "Os grupos que você criar ou participar vão aparecer aqui."
+                title = "Nenhum espaço criado",
+                body = "Crie um lugar para sua turma existir do jeito de vocês."
             )
         }
     }
@@ -419,12 +425,12 @@ private fun ExploreScreen(interests: List<String>) {
     RebelionScreen {
         item {
             SectionTitle(
-                title = "Explorar",
-                subtitle = "Encontre comunidades, salas e pessoas com interesses parecidos com os seus."
+                title = "Radar",
+                subtitle = "Encontre espaços, pessoas e comunidades próximas dos seus interesses."
             )
         }
         if (interests.isNotEmpty()) {
-            item { SectionHeader("Seus interesses") }
+            item { SectionHeader("Sinais do seu radar") }
             item {
                 FlowLikeChips(values = interests, selectedValues = interests, onToggle = {})
             }
@@ -432,8 +438,8 @@ private fun ExploreScreen(interests: List<String>) {
         item {
             EmptyStateCard(
                 icon = Icons.Filled.Search,
-                title = "Nada para explorar ainda",
-                body = "Comunidades públicas aparecem aqui quando estiverem disponíveis para descoberta."
+                title = "Nada no radar ainda",
+                body = "Quando comunidades públicas surgirem, elas aparecem aqui para descoberta."
             )
         }
     }
@@ -456,13 +462,13 @@ private fun ProfileScreen(nickname: String, interests: List<String>) {
                 }
             }
         }
-        item { SectionHeader("Interesses") }
+        item { SectionHeader("Identidade") }
         item {
             if (interests.isEmpty()) {
                 EmptyStateCard(
                     icon = Icons.Filled.Edit,
-                    title = "Seu perfil ainda está limpo",
-                    body = "Adicione interesses, escolha sua identidade visual e deixe seu perfil com a sua cara."
+                    title = "Sua identidade está em branco",
+                    body = "Adicione interesses, status e estilo para ser reconhecido do seu jeito."
                 )
             } else {
                 FlowLikeChips(
@@ -519,17 +525,51 @@ private fun RebelionGradientBackground(content: @Composable () -> Unit) {
 }
 
 @Composable
-private fun TopGreeting(nickname: String) {
+private fun HubHeader(nickname: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Column {
-            Text("Olá, $nickname", color = Color.White, fontWeight = FontWeight.Black, fontSize = 28.sp)
-            Text("Construa sua presença no Rebelion.", color = RebelionColors.Mist, fontSize = 14.sp)
+            Text("Hub", color = Color.White, fontWeight = FontWeight.Black, fontSize = 32.sp)
+            Text("$nickname, escolha o que quer mover agora.", color = RebelionColors.Mist, fontSize = 14.sp)
         }
         AvatarBubble(label = nickname.take(1).uppercase().ifBlank { "R" }, color = RebelionColors.Steel)
+    }
+}
+
+@Composable
+private fun PresenceCard() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = RebelionColors.Elevated),
+        border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.14f))
+    ) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(42.dp)
+                        .clip(CircleShape)
+                        .background(RebelionColors.Panel),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Filled.Person, contentDescription = null, tint = RebelionColors.Silver)
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Presença", color = RebelionColors.Muted, fontSize = 13.sp)
+                    Text("Querendo conversar ✦", color = Color.White, fontWeight = FontWeight.Black, fontSize = 18.sp)
+                }
+            }
+            Text(
+                "Seu status mostra como você quer ser encontrado no Rebelion.",
+                color = RebelionColors.Mist,
+                lineHeight = 20.sp
+            )
+        }
     }
 }
 
