@@ -350,16 +350,10 @@ private fun MainExperience(
     Scaffold(
         containerColor = RebelionColors.DeepSpace,
         bottomBar = {
-            NavigationBar(containerColor = RebelionColors.Panel.copy(alpha = 0.98f)) {
-                MainTab.entries.forEach { tab ->
-                    NavigationBarItem(
-                        selected = selectedTab == tab,
-                        onClick = { selectedTab = tab },
-                        icon = { Icon(tab.icon, contentDescription = tab.label) },
-                        label = { Text(tab.label, fontSize = 11.sp) }
-                    )
-                }
-            }
+            RebelionGlassNavBar(
+                selectedTab = selectedTab,
+                onSelectTab = { selectedTab = it }
+            )
         }
     ) { padding ->
         Box(
@@ -383,6 +377,77 @@ private fun MainExperience(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun RebelionGlassNavBar(selectedTab: MainTab, onSelectTab: (MainTab) -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 18.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(78.dp),
+            shape = RoundedCornerShape(38.dp),
+            colors = CardDefaults.cardColors(containerColor = RebelionColors.Glass.copy(alpha = 0.72f)),
+            border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.22f))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(
+                                Color.White.copy(alpha = 0.10f),
+                                RebelionColors.Glass.copy(alpha = 0.34f),
+                                Color.White.copy(alpha = 0.07f)
+                            )
+                        )
+                    )
+                    .padding(horizontal = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    MainTab.entries.forEach { tab ->
+                        GlassNavItem(
+                            tab = tab,
+                            selected = selectedTab == tab,
+                            onClick = { onSelectTab(tab) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GlassNavItem(tab: MainTab, selected: Boolean, onClick: () -> Unit) {
+    val background = if (selected) RebelionColors.GlassSelected.copy(alpha = 0.82f) else Color.Transparent
+    val tint = if (selected) RebelionColors.White else RebelionColors.Mist.copy(alpha = 0.82f)
+
+    Box(
+        modifier = Modifier
+            .size(if (selected) 58.dp else 52.dp)
+            .clip(CircleShape)
+            .background(background)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            tab.icon,
+            contentDescription = tab.label,
+            tint = tint,
+            modifier = Modifier.size(if (selected) 29.dp else 26.dp)
+        )
     }
 }
 
@@ -1223,6 +1288,8 @@ private object RebelionColors {
     val Slate = Color(0xFF565D6B)
     val Steel = Color(0xFF7F8794)
     val WarmGrey = Color(0xFF6F6B65)
+    val Glass = Color(0xFF24212D)
+    val GlassSelected = Color(0xFF5D536F)
     val Silver = Color(0xFFD8DBE2)
     val White = Color(0xFFF4F5F7)
     val Mist = Color(0xFFE1E3E8)
