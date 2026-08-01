@@ -3,17 +3,23 @@ package com.rebelion.app
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -56,6 +62,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
@@ -382,41 +389,96 @@ private fun MainExperience(
 
 @Composable
 private fun RebelionGlassNavBar(selectedTab: MainTab, onSelectTab: (MainTab) -> Unit) {
+    val tabs = MainTab.entries
+    val selectedIndex = tabs.indexOf(selectedTab).coerceAtLeast(0)
+    val indicatorSize = 64.dp
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 18.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
-        Card(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(78.dp),
-            shape = RoundedCornerShape(38.dp),
-            colors = CardDefaults.cardColors(containerColor = RebelionColors.Glass.copy(alpha = 0.72f)),
-            border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.22f))
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(
-                                Color.White.copy(alpha = 0.10f),
-                                RebelionColors.Glass.copy(alpha = 0.34f),
-                                Color.White.copy(alpha = 0.07f)
-                            )
+                .height(84.dp)
+                .shadow(
+                    elevation = 18.dp,
+                    shape = RoundedCornerShape(42.dp),
+                    ambientColor = RebelionColors.GlassGlow.copy(alpha = 0.22f),
+                    spotColor = Color.Black.copy(alpha = 0.65f)
+                )
+                .clip(RoundedCornerShape(42.dp))
+                .background(RebelionColors.Glass.copy(alpha = 0.38f))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(
+                            Color.White.copy(alpha = 0.22f),
+                            Color.White.copy(alpha = 0.06f),
+                            Color.Black.copy(alpha = 0.18f)
                         )
                     )
-                    .padding(horizontal = 10.dp),
-                contentAlignment = Alignment.Center
+                )
+                .border(
+                    width = 1.dp,
+                    brush = Brush.horizontalGradient(
+                        listOf(
+                            Color.White.copy(alpha = 0.42f),
+                            Color.White.copy(alpha = 0.12f),
+                            RebelionColors.GlassGlow.copy(alpha = 0.28f)
+                        )
+                    ),
+                    shape = RoundedCornerShape(42.dp)
+                )
+                .padding(horizontal = 10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.CenterStart
             ) {
+                val itemWidth = maxWidth / tabs.size
+                val targetOffset = (itemWidth * selectedIndex.toFloat()) + ((itemWidth - indicatorSize) / 2)
+                val animatedOffset by animateDpAsState(
+                    targetValue = targetOffset,
+                    animationSpec = tween(durationMillis = 380, easing = FastOutSlowInEasing),
+                    label = "glass-nav-indicator"
+                )
+
+                Box(
+                    modifier = Modifier
+                        .offset(x = animatedOffset)
+                        .size(indicatorSize)
+                        .shadow(
+                            elevation = 12.dp,
+                            shape = CircleShape,
+                            ambientColor = RebelionColors.GlassGlow.copy(alpha = 0.32f),
+                            spotColor = Color.Black.copy(alpha = 0.70f)
+                        )
+                        .clip(CircleShape)
+                        .background(
+                            Brush.radialGradient(
+                                listOf(
+                                    Color.White.copy(alpha = 0.26f),
+                                    RebelionColors.GlassSelected.copy(alpha = 0.82f),
+                                    RebelionColors.GlassSelected.copy(alpha = 0.48f)
+                                )
+                            )
+                        )
+                        .border(
+                            1.dp,
+                            Color.White.copy(alpha = 0.24f),
+                            CircleShape
+                        )
+                )
+
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.SpaceAround,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    MainTab.entries.forEach { tab ->
+                    tabs.forEach { tab ->
                         GlassNavItem(
                             tab = tab,
                             selected = selectedTab == tab,
@@ -431,14 +493,12 @@ private fun RebelionGlassNavBar(selectedTab: MainTab, onSelectTab: (MainTab) -> 
 
 @Composable
 private fun GlassNavItem(tab: MainTab, selected: Boolean, onClick: () -> Unit) {
-    val background = if (selected) RebelionColors.GlassSelected.copy(alpha = 0.82f) else Color.Transparent
-    val tint = if (selected) RebelionColors.White else RebelionColors.Mist.copy(alpha = 0.82f)
+    val tint = if (selected) RebelionColors.NavActive else RebelionColors.Mist.copy(alpha = 0.72f)
 
     Box(
         modifier = Modifier
-            .size(if (selected) 58.dp else 52.dp)
+            .size(58.dp)
             .clip(CircleShape)
-            .background(background)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -446,7 +506,7 @@ private fun GlassNavItem(tab: MainTab, selected: Boolean, onClick: () -> Unit) {
             tab.icon,
             contentDescription = tab.label,
             tint = tint,
-            modifier = Modifier.size(if (selected) 29.dp else 26.dp)
+            modifier = Modifier.size(if (selected) 31.dp else 27.dp)
         )
     }
 }
@@ -1290,6 +1350,8 @@ private object RebelionColors {
     val WarmGrey = Color(0xFF6F6B65)
     val Glass = Color(0xFF24212D)
     val GlassSelected = Color(0xFF5D536F)
+    val GlassGlow = Color(0xFFB8A7D9)
+    val NavActive = Color(0xFFF4F0FF)
     val Silver = Color(0xFFD8DBE2)
     val White = Color(0xFFF4F5F7)
     val Mist = Color(0xFFE1E3E8)

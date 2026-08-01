@@ -16,7 +16,22 @@ A navegação inferior deixa de ser uma `NavigationBar` padrão e passa a ser um
 - com borda suave;
 - com brilho/gradiente interno simulando vidro;
 - com ícones sem texto visível;
-- com item selecionado em um círculo translúcido.
+- com item selecionado dentro de uma bolha circular;
+- com indicador selecionado deslizando horizontalmente entre os ícones;
+- com sensação visual mais 3D.
+
+## Versão atual
+
+A barra usa uma simulação de liquid glass/glassmorphism com:
+
+- transparência maior;
+- gradiente vertical de brilho;
+- borda com gradiente;
+- sombra externa;
+- bolha selecionada com radial gradient;
+- ícone ativo preenchido em cor clara;
+- ícones inativos com menor opacidade;
+- animação de slide entre abas.
 
 ## Importante
 
@@ -28,9 +43,9 @@ Mesmo sem texto visível na barra, os ícones mantêm `contentDescription`, perm
 
 ## Próximas evoluções
 
-- animação ao trocar de aba;
 - feedback tátil;
 - ripple customizado;
 - blur real quando disponível/viável;
 - botão central de ação;
-- variação do glass conforme estilo do Cartão Rebelion.
+- movimento líquido mais orgânico;
+- ícones personalizados próprios do Rebelion.
