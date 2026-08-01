@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -104,6 +105,8 @@ private fun RebelionApp() {
     ) {
         var stage by remember { mutableStateOf(AppStage.Welcome) }
         var nickname by remember { mutableStateOf("Nox") }
+        var bio by remember { mutableStateOf("criando meu universo, encontrando minha turma e deixando minha marca no Rebelion.") }
+        var status by remember { mutableStateOf("Querendo conversar ✦") }
         val selectedInterests = remember { mutableStateListOf<String>() }
 
         Surface(
@@ -131,7 +134,19 @@ private fun RebelionApp() {
                     onContinue = { stage = AppStage.Main }
                 )
 
-                AppStage.Main -> MainExperience(nickname = nickname, interests = selectedInterests)
+                AppStage.Main -> MainExperience(
+                    nickname = nickname,
+                    bio = bio,
+                    status = status,
+                    interests = selectedInterests,
+                    onSaveCard = { newNickname, newBio, newStatus, newInterests ->
+                        nickname = newNickname.ifBlank { "Nox" }
+                        bio = newBio
+                        status = newStatus
+                        selectedInterests.clear()
+                        selectedInterests.addAll(newInterests)
+                    }
+                )
             }
         }
     }
@@ -265,10 +280,7 @@ private fun InterestsScreen(
     onToggleInterest: (String) -> Unit,
     onContinue: () -> Unit
 ) {
-    val interests = listOf(
-        "Jogos", "Anime", "Música", "Filmes", "Séries", "Tecnologia",
-        "Humor", "Arte", "Estudo", "Criadores", "Fandoms", "Esportes"
-    )
+    val interests = interestOptions()
 
     RebelionGradientBackground {
         Column(
@@ -304,8 +316,31 @@ private fun InterestsScreen(
 }
 
 @Composable
-private fun MainExperience(nickname: String, interests: List<String>) {
+private fun MainExperience(
+    nickname: String,
+    bio: String,
+    status: String,
+    interests: List<String>,
+    onSaveCard: (String, String, String, List<String>) -> Unit
+) {
     var selectedTab by remember { mutableStateOf(MainTab.Home) }
+    var editingCard by remember { mutableStateOf(false) }
+
+    if (editingCard) {
+        EditCardScreen(
+            nickname = nickname,
+            bio = bio,
+            status = status,
+            interests = interests,
+            onBack = { editingCard = false },
+            onSave = { newNickname, newBio, newStatus, newInterests ->
+                onSaveCard(newNickname, newBio, newStatus, newInterests)
+                editingCard = false
+                selectedTab = MainTab.Profile
+            }
+        )
+        return
+    }
 
     Scaffold(
         containerColor = RebelionColors.DeepSpace,
@@ -329,18 +364,24 @@ private fun MainExperience(nickname: String, interests: List<String>) {
                 .background(RebelionColors.DeepSpace)
         ) {
             when (selectedTab) {
-                MainTab.Home -> HomeScreen(nickname = nickname)
+                MainTab.Home -> HomeScreen(nickname = nickname, onEditCard = { editingCard = true })
                 MainTab.Conversations -> ConversationsScreen()
                 MainTab.Groups -> GroupsScreen()
                 MainTab.Explore -> ExploreScreen(interests = interests)
-                MainTab.Profile -> ProfileScreen(nickname = nickname, interests = interests)
+                MainTab.Profile -> ProfileScreen(
+                    nickname = nickname,
+                    bio = bio,
+                    status = status,
+                    interests = interests,
+                    onEditCard = { editingCard = true }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun HomeScreen(nickname: String) {
+private fun HomeScreen(nickname: String, onEditCard: () -> Unit) {
     RebelionScreen {
         item {
             HubHeader(nickname = nickname)
@@ -359,7 +400,7 @@ private fun HomeScreen(nickname: String) {
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
                     QuickAction(Icons.Filled.Mic, "Gravar voz", Modifier.weight(1f))
-                    QuickAction(Icons.Filled.Edit, "Personalizar", Modifier.weight(1f))
+                    QuickAction(Icons.Filled.Edit, "Personalizar", Modifier.weight(1f), onClick = onEditCard)
                 }
             }
         }
@@ -443,7 +484,7 @@ private fun ExploreScreen(interests: List<String>) {
 }
 
 @Composable
-private fun ProfileScreen(nickname: String, interests: List<String>) {
+private fun ProfileScreen(nickname: String, bio: String, status: String, interests: List<String>, onEditCard: () -> Unit) {
     RebelionScreen {
         item {
             SectionTitle(
@@ -451,9 +492,9 @@ private fun ProfileScreen(nickname: String, interests: List<String>) {
                 subtitle = "Seu Cartão Rebelion reúne presença, identidade, estilo e controle."
             )
         }
-        item { ProfilePreviewCard(nickname = nickname.ifBlank { "Nox" }) }
+        item { ProfilePreviewCard(nickname = nickname.ifBlank { "Nox" }, status = status) }
         item {
-            RebelionIdentityCard(interests = interests)
+            RebelionIdentityCard(bio = bio, status = status, interests = interests)
         }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -481,7 +522,7 @@ private fun ProfileScreen(nickname: String, interests: List<String>) {
         }
         item {
             OutlinedButton(
-                onClick = {},
+                onClick = onEditCard,
                 modifier = Modifier.fillMaxWidth(),
                 border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.8f)),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
@@ -490,6 +531,109 @@ private fun ProfileScreen(nickname: String, interests: List<String>) {
                 Spacer(Modifier.width(8.dp))
                 Text("Editar Cartão")
             }
+        }
+    }
+}
+
+@Composable
+private fun EditCardScreen(
+    nickname: String,
+    bio: String,
+    status: String,
+    interests: List<String>,
+    onBack: () -> Unit,
+    onSave: (String, String, String, List<String>) -> Unit
+) {
+    var draftNickname by remember { mutableStateOf(nickname) }
+    var draftBio by remember { mutableStateOf(bio) }
+    var draftStatus by remember { mutableStateOf(status) }
+    val draftInterests = remember { mutableStateListOf<String>().apply { addAll(interests) } }
+    var selectedStyle by remember { mutableStateOf("Mono") }
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(RebelionColors.DeepSpace)
+            .padding(horizontal = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(top = 22.dp, bottom = 28.dp)
+    ) {
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Editar Cartão", color = Color.White, fontWeight = FontWeight.Black, fontSize = 30.sp)
+                    Text("Ajuste como sua presença aparece no Rebelion.", color = RebelionColors.Mist, lineHeight = 20.sp)
+                }
+                OutlinedButton(
+                    onClick = onBack,
+                    border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.45f)),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                ) {
+                    Text("Voltar")
+                }
+            }
+        }
+        item {
+            ProfilePreviewCard(nickname = draftNickname.ifBlank { "Nox" }, status = draftStatus)
+        }
+        item {
+            RebelionCard {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Identidade", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                    RebelionTextField(value = draftNickname, onValueChange = { draftNickname = it }, label = "Nickname")
+                    RebelionTextField(value = draftBio, onValueChange = { draftBio = it }, label = "Bio")
+                }
+            }
+        }
+        item {
+            RebelionCard {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Presença", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                    FlowLikeChips(
+                        values = statusOptions(),
+                        selectedValues = listOf(draftStatus),
+                        onToggle = { draftStatus = it }
+                    )
+                }
+            }
+        }
+        item {
+            RebelionCard {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Interesses", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                    FlowLikeChips(
+                        values = interestOptions(),
+                        selectedValues = draftInterests,
+                        onToggle = { interest ->
+                            if (draftInterests.contains(interest)) draftInterests.remove(interest)
+                            else draftInterests.add(interest)
+                        }
+                    )
+                }
+            }
+        }
+        item {
+            RebelionCard {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Estilo do cartão", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
+                    Text("Nesta fase, o estilo muda a intenção visual do cartão. As cores completas entram na próxima etapa.", color = RebelionColors.Mist, lineHeight = 20.sp)
+                    FlowLikeChips(
+                        values = listOf("Mono", "Neon", "Aurora", "Minimal"),
+                        selectedValues = listOf(selectedStyle),
+                        onToggle = { selectedStyle = it }
+                    )
+                }
+            }
+        }
+        item {
+            RebelionButton(
+                text = "Salvar Cartão",
+                onClick = { onSave(draftNickname, draftBio, draftStatus, draftInterests.toList()) }
+            )
         }
     }
 }
@@ -622,7 +766,7 @@ private fun NucleusMetric(label: String, value: String, modifier: Modifier = Mod
 }
 
 @Composable
-private fun RebelionIdentityCard(interests: List<String>) {
+private fun RebelionIdentityCard(bio: String, status: String, interests: List<String>) {
     RebelionCard {
         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -641,9 +785,9 @@ private fun RebelionIdentityCard(interests: List<String>) {
                     Text("Sua identidade pública começa aqui.", color = RebelionColors.Muted, fontSize = 13.sp)
                 }
             }
-            Text("Querendo conversar ✦", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(status, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(
-                "Bio: criando meu universo, encontrando minha turma e deixando minha marca no Rebelion.",
+                "Bio: $bio",
                 color = RebelionColors.Mist,
                 lineHeight = 20.sp
             )
@@ -695,7 +839,7 @@ private fun RebelionSectionTile(icon: ImageVector, title: String, body: String) 
 }
 
 @Composable
-private fun ProfilePreviewCard(nickname: String) {
+private fun ProfilePreviewCard(nickname: String, status: String = "Querendo conversar ✦") {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
@@ -722,7 +866,7 @@ private fun ProfilePreviewCard(nickname: String) {
                 Column {
                     Text(nickname, color = Color.White, fontWeight = FontWeight.Black, fontSize = 24.sp)
                     Text("@${nickname.lowercase().filter { it.isLetterOrDigit() }.ifBlank { "usuario" }}", color = RebelionColors.Muted)
-                    Text("Querendo conversar ✦", color = RebelionColors.Cyan, fontSize = 13.sp)
+                    Text(status, color = RebelionColors.Cyan, fontSize = 13.sp)
                 }
             }
         }
@@ -838,9 +982,9 @@ private fun DiscoveryCard(title: String, subtitle: String) {
 }
 
 @Composable
-private fun QuickAction(icon: ImageVector, label: String, modifier: Modifier = Modifier) {
+private fun QuickAction(icon: ImageVector, label: String, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     Card(
-        modifier = modifier.height(92.dp),
+        modifier = modifier.height(92.dp).clickable { onClick() },
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = RebelionColors.Panel),
         border = BorderStroke(1.dp, RebelionColors.Silver.copy(alpha = 0.08f))
@@ -992,6 +1136,15 @@ private fun SectionTitle(title: String, subtitle: String) {
 private fun SectionHeader(text: String) {
     Text(text, color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
 }
+
+private fun interestOptions() = listOf(
+    "Jogos", "Anime", "Música", "Filmes", "Séries", "Tecnologia",
+    "Humor", "Arte", "Estudo", "Criadores", "Fandoms", "Esportes"
+)
+
+private fun statusOptions() = listOf(
+    "Querendo conversar ✦", "Criando", "Jogando", "Assistindo", "Estudando", "Ocupado"
+)
 
 private fun sampleConversations() = listOf(
     Conversation("Luna", "online", "Mandei um áudio com efeito robô kkk", 2, RebelionColors.Slate),
