@@ -390,7 +390,7 @@ private fun RebelionGlassNavBar(
 ) {
     val tabs = MainTab.entries
     val selectedIndex = tabs.indexOf(selectedTab).coerceAtLeast(0)
-    val indicatorSize = 64.dp
+    val indicatorHeight = 76.dp
 
     Box(
         modifier = modifier
@@ -409,13 +409,13 @@ private fun RebelionGlassNavBar(
                     spotColor = Color.Black.copy(alpha = 0.65f)
                 )
                 .clip(RoundedCornerShape(42.dp))
-                .background(RebelionColors.Glass.copy(alpha = 0.12f))
+                .background(RebelionColors.Glass.copy(alpha = 0.08f))
                 .background(
                     Brush.verticalGradient(
                         listOf(
-                            Color.White.copy(alpha = 0.30f),
-                            Color.White.copy(alpha = 0.08f),
-                            RebelionColors.GlassGlow.copy(alpha = 0.05f)
+                            Color.White.copy(alpha = 0.42f),
+                            Color.White.copy(alpha = 0.20f),
+                            RebelionColors.GlassGlow.copy(alpha = 0.10f)
                         )
                     )
                 )
@@ -438,37 +438,54 @@ private fun RebelionGlassNavBar(
                 contentAlignment = Alignment.CenterStart
             ) {
                 val itemWidth = maxWidth / tabs.size
-                val targetOffset = (itemWidth * selectedIndex.toFloat()) + ((itemWidth - indicatorSize) / 2)
+                val indicatorWidth = itemWidth - 4.dp
+                val targetOffset = (itemWidth * selectedIndex.toFloat()) + ((itemWidth - indicatorWidth) / 2)
                 val animatedOffset by animateDpAsState(
                     targetValue = targetOffset,
-                    animationSpec = tween(durationMillis = 380, easing = FastOutSlowInEasing),
+                    animationSpec = tween(durationMillis = 420, easing = FastOutSlowInEasing),
                     label = "glass-nav-indicator"
+                )
+
+                // Frosted veil: abafa textos/bordas que passam por baixo da barra.
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(
+                                    Color.White.copy(alpha = 0.12f),
+                                    Color.White.copy(alpha = 0.20f),
+                                    Color.White.copy(alpha = 0.10f)
+                                )
+                            )
+                        )
                 )
 
                 Box(
                     modifier = Modifier
                         .offset(x = animatedOffset)
-                        .size(indicatorSize)
+                        .width(indicatorWidth)
+                        .height(indicatorHeight)
                         .shadow(
-                            elevation = 12.dp,
-                            shape = CircleShape,
-                            ambientColor = RebelionColors.GlassGlow.copy(alpha = 0.32f),
-                            spotColor = Color.Black.copy(alpha = 0.70f)
+                            elevation = 14.dp,
+                            shape = RoundedCornerShape(38.dp),
+                            ambientColor = RebelionColors.GlassGlow.copy(alpha = 0.36f),
+                            spotColor = Color.Black.copy(alpha = 0.72f)
                         )
-                        .clip(CircleShape)
+                        .clip(RoundedCornerShape(38.dp))
                         .background(
-                            Brush.radialGradient(
+                            Brush.verticalGradient(
                                 listOf(
                                     Color.White.copy(alpha = 0.34f),
-                                    RebelionColors.GlassSelected.copy(alpha = 0.54f),
-                                    RebelionColors.GlassSelected.copy(alpha = 0.22f)
+                                    RebelionColors.GlassSelected.copy(alpha = 0.62f),
+                                    RebelionColors.GlassSelected.copy(alpha = 0.30f)
                                 )
                             )
                         )
                         .border(
                             1.dp,
-                            Color.White.copy(alpha = 0.24f),
-                            CircleShape
+                            Color.White.copy(alpha = 0.26f),
+                            RoundedCornerShape(38.dp)
                         )
                 )
 
@@ -492,7 +509,7 @@ private fun RebelionGlassNavBar(
 
 @Composable
 private fun GlassNavItem(tab: MainTab, selected: Boolean, onClick: () -> Unit) {
-    val tint = if (selected) RebelionColors.NavActive else RebelionColors.Mist.copy(alpha = 0.72f)
+    val tint = if (selected) RebelionColors.NavActive else RebelionColors.Mist.copy(alpha = 0.66f)
 
     Box(
         modifier = Modifier

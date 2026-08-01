@@ -16,28 +16,35 @@ A navegação inferior deixa de ser uma `NavigationBar` padrão e passa a ser um
 - com borda suave;
 - com brilho/gradiente interno simulando vidro;
 - com ícones sem texto visível;
-- com item selecionado dentro de uma bolha circular;
+- com item selecionado dentro de uma célula arredondada;
 - com indicador selecionado deslizando horizontalmente entre os ícones;
 - com sensação visual mais 3D.
 
 ## Versão atual
 
-A barra agora é desenhada como **overlay sobre o conteúdo**, em vez de ocupar uma área própria de rodapé. Isso permite que o conteúdo da tela apareça por trás da navegação e reduz a sensação de fundo preto sólido.
+A barra é desenhada como **overlay sobre o conteúdo**, em vez de ocupar uma área própria de rodapé. Isso permite que o conteúdo da tela passe por baixo da navegação.
+
+Para evitar que textos e bordas passando por baixo pareçam estar acima da barra, a cápsula agora possui uma camada interna de **frosted veil**. Essa camada não é blur real, mas abafa visualmente o conteúdo por trás usando transparência leitosa e gradiente.
 
 A simulação de liquid glass/glassmorphism usa:
 
-- camada base mais transparente;
+- camada base muito transparente;
+- frosted veil interno;
 - gradiente vertical de brilho;
 - borda com gradiente;
 - sombra externa;
-- bolha selecionada com radial gradient mais translúcido;
+- célula selecionada quase do tamanho do espaço de cada ícone;
 - ícone ativo preenchido em cor clara;
 - ícones inativos com menor opacidade;
 - animação de slide entre abas.
 
+## Indicador selecionado
+
+A seleção não usa mais uma bolinha pequena ao redor do ícone. Agora ela usa uma célula arredondada que ocupa quase toda a altura da barra e fica limitada ao espaço daquele ícone, sem invadir a área dos outros.
+
 ## Limite técnico atual
 
-Esta versão ainda não usa blur real do conteúdo atrás da barra. No Android/Compose, blur real com bom desempenho precisa ser implementado com cuidado em etapa própria. Por enquanto, a barra usa transparência, gradiente, borda e sombra para simular vidro.
+Esta versão ainda não usa blur real do conteúdo atrás da barra. No Android/Compose, blur real com bom desempenho precisa ser implementado com cuidado em etapa própria. Por enquanto, a barra usa transparência, gradiente, camada leitosa, borda e sombra para simular vidro.
 
 ## Importante
 
